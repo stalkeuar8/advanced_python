@@ -2,9 +2,12 @@ from ..database.filling_getting_user_info import add_to_cart_db, add_order_to_db
     get_variant_info, get_coffee_names, get_coffee_slugs, get_id_of_coffee_type, get_variants_by_id, check_cart_db_limit
 from aiogram import types, Router, F
 from cafe_bot.keyboards.menu import generate_menu_kb
+from aiogram.filters import Command
 from cafe_bot.keyboards.catalog_menu import BuyingFromCartCB, ClearCartCB, DeleteElCB ,generate_cart_bts, generate_menu_catalog_kb, generate_sizes_prices_kb, CoffeeNameCBdata, SizePriceCBdata, generate_buying_menu, BuyingOperationCB
 from cafe_bot.other_funcs import list_to_str_json
 from cafe_bot.logs.logging import logger
+from cafe_bot.fsm.states import PayingProcess
+from aiogram.fsm.context import FSMContext
 
 router = Router()
 path = r"D:\coding\python\telegram\cafe_bot\database\cafe_bot_info.db"
@@ -49,6 +52,11 @@ async def choose_size_buy(callback: types.CallbackQuery, callback_data: SizePric
     var_info = get_variant_info(callback_data.variant_id)
     chosen_line = f"{coffee_name} | {var_info[2]} - {var_info[3]} ml | Price: {var_info[4]} Uah"
     await callback.message.edit_text(text=f"{chosen_line}", reply_markup=generate_buying_menu(callback_data.variant_id, coffee_name, coffee_slug))
+
+@router.callback_query(PayingProcess.filter())
+async def paying_process(callback: types.callback_query, callback_data: PayingProcess, state: FSMContext):
+    await state.set_state(PayingProcess.paying_currency)
+    await callback.message.edit_text(text="")
 
 
 @router.callback_query(BuyingOperationCB.filter())
