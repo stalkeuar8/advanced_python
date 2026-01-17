@@ -70,7 +70,7 @@ ProjectRoot/
 │   ├── model/             # ML logic & .pkl file
 │   └── logs/              # Log files storage
 └── .env                   # Secrets
-
+```
 ---
 
 ### ⚡ Setup & Run
@@ -88,3 +88,4 @@ BOT_TOKEN=your_telegram_bot_token_here
 ```bash
 python -m cafe_bot.main
 ```
+
