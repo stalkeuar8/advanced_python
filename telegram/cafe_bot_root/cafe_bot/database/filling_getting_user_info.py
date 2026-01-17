@@ -63,11 +63,11 @@ def get_coffee_name_by_type_id(coffee_type_id: int) -> str:
 
 
 @is_db_exists
-def get_coffee_info(slug: str = None) -> list:
-    slug_to_find = [slug]
+def get_coffee_info(product_id: str = None) -> list:
+    id_to_find = [product_id]
     with sqlite3.connect(db_path) as db_file:
         c = db_file.cursor()
-        c.execute("SELECT * FROM products WHERE slug = (?)", slug_to_find)
+        c.execute("SELECT * FROM products WHERE id = (?)", id_to_find)
         coffee_info = c.fetchall()[0]
     return coffee_info
 
