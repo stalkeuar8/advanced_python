@@ -2,7 +2,7 @@ from cafe_bot.database.filling_getting_user_info import add_to_cart_db, add_orde
     get_variant_info, get_coffee_names, get_coffee_slugs, get_id_of_coffee_type, get_variants_by_id, check_cart_db_limit, get_coffee_info
 from aiogram import types, Router, F
 from cafe_bot.keyboards.menu import generate_menu_kb
-from cafe_bot.keyboards.catalog_menu import ShowCartCB, generate_paying_menu_single_bts, generate_paying_menu_cart_bts, AddToCartCB, BuyingFromCartCB, ClearCartCB, DeleteElCB ,generate_cart_bts, generate_menu_catalog_kb, generate_sizes_prices_kb, CoffeeNameCBdata, SizePriceCBdata, generate_buying_menu, PaymentMenuCB
+from cafe_bot.keyboards.catalog_menu import ShowCartCB, generate_paying_menu_single_bts, generate_paying_menu_cart_bts, AddToCartCB, ClearCartCB, DeleteElCB ,generate_cart_bts, generate_menu_catalog_kb, generate_sizes_prices_kb, CoffeeNameCBdata, SizePriceCBdata, generate_buying_menu, PaymentMenuCB
 from cafe_bot.other_funcs import list_to_str_json, str_to_list_json
 from cafe_bot.logs.logging import logger
 from cafe_bot.fsm.states import ValidatePayment
@@ -12,7 +12,6 @@ from cafe_bot.model.predictor import predict_time
 from typing import Union
 
 router = Router()
-path = r"D:\coding\python\telegram\cafe_bot\database\cafe_bot_info.db"
 
 @router.message(F.text == 'Contacts 📞')
 async def show_contacts(message: types.Message):
@@ -115,50 +114,6 @@ async def receiving_payment(message: types.Message, state: FSMContext):
                     ))
 
 
-
-# @router.callback_query(BuyingOperationCB.filter())
-# async def buying_operation(callback: types.CallbackQuery, callback_data: BuyingOperationCB):
-#     if callback_data.operation_type == 'buying menu':
-#         user_id = str(callback.from_user.id)
-#         var_info = get_variant_info(callback_data.variant_id)
-#         order_id = add_order_to_db(user_id, var_info[3], str(var_info[0]))
-#         logger.bind(type='sale').info(f"User {callback.from_user.username} ({user_id}) ordered (order id: {order_id}) | Variant id: {var_info[0]}")
-#         logger.bind(type='payment').info(f"User {callback.from_user.username} ({user_id}) made a payment: SUCCESSFUL. | Order id: {order_id}")
-#         await callback.message.edit_text(text='Here will be a payment page. Use btn to come back to menu', reply_markup=types.InlineKeyboardMarkup(
-#                         inline_keyboard=[
-#                             [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
-#                         ]
-#                     )
-#                 )
-# #         # await callback.message.edit_text(text="Please, make a payment! (Send 💋)", reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text='Back to payment menu', callback_data=SizePriceCBdata(variant_id=callback_data.variant_id, coffee_name=callback_data.coffee_name).pack())]]))
-# #         # @router.message()
-# #         # async def buying(message: types.Message):
-# #         #     if message.text == '💋':
-# #         #         await callback.message.edit_text(text='Receiving payment.. 💸\n\nIt may take few seconds.')
-# #         #         await asyncio.sleep(3)
-# #         #         await callback.message.answer(
-# #         #             text='Payment successfully received! Thank you for using our cafe bot! ☕ \n\nUse button below to come back to menu:',
-# #         #             reply_markup=types.InlineKeyboardMarkup(
-# #         #                 inline_keyboard=[
-# #         #                     [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
-# #         #                 ]
-# #         #             )
-# #         #         )
-# #         #     else:
-# #         #         await message.edit_text(text='Receiving payment... 💸\n\nIt may take few seconds.')
-# #         #         await callback.message.edit_text(
-# #         #             text='Wrong payment details received. Payment canceled. ❌\n\nPlease try more later.\n\nUse button below to come back to menu:',
-# #         #             reply_markup=types.InlineKeyboardMarkup(
-# #         #                 inline_keyboard=[
-# #         #                     [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
-# #         #                 ]
-# #         #             )
-# #         #         )
-#     elif callback_data.operation_type == 'add to cart':
-#         pass
-#     else:
-#         raise ValueError("ERROR: Wrong operation type. Must be ('add to cart' or 'buying menu').")
-
 @router.callback_query(AddToCartCB.filter())
 async def add_to_cart(callback: types.CallbackQuery, callback_data: AddToCartCB):
     user_id = str(callback.from_user.id)
@@ -183,24 +138,6 @@ async def add_to_cart(callback: types.CallbackQuery, callback_data: AddToCartCB)
                 [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
             ])
         )
-
-
-@router.callback_query(BuyingFromCartCB.filter())
-async def buying_from_cart(callback: types.CallbackQuery, callback_data: BuyingFromCartCB):
-    variants_ids = callback_data.variants_ids
-    user_id = callback_data.user_id
-    general_price = callback_data.general_price
-    order_id = add_order_to_db(user_id, general_price, variants_ids)
-    clear_user_cart(user_id)
-    logger.bind(type='sale').info(f"User {callback.from_user.username} ({user_id}) ordered (order id: {order_id}) | Variant id: {variants_ids}")
-    logger.bind(type='payment').info(f"User {callback.from_user.username} ({user_id}) made a payment: SUCCESSFUL. | Order id: {order_id}")
-    await callback.message.edit_text(text='Here will be a payment page. Use btn to come back to menu', reply_markup=types.InlineKeyboardMarkup(
-                        inline_keyboard=[
-                            [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
-                        ]
-                    )
-                )
-
 
 
 @router.callback_query(ShowCartCB.filter())
@@ -243,47 +180,3 @@ async def delete_last_el(callback: types.CallbackQuery, callback_data: DeleteElC
     logger.bind(type='cart').info(f"User {callback.from_user.username} ({user_id}) deleted last element in cart!")
     await callback.message.answer(text='Last element has been deleted!\n\nUse  "Cart 🛒"  to see cart one more time!\n\nOr use  "Menu ☕"  to see menu!')
 
-
-#
-#
-# MENU_CATALOG = {
-#     "Americano": {
-#         "text": "Americano",
-#         "sizes_prices": {
-#             1: {'size': 'Small - 150 ml', 'price': 35},
-#             2: {'size': 'Medium - 250 ml', 'price': 45},
-#             3: {'size': 'Big - 350 ml', 'price': 50}
-#         }
-#     },
-#     "Espresso": {
-#         "text": "Espresso",
-#         "sizes_prices": {
-#             4: {'size': 'Standard - 30 ml', 'price': 20},
-#             5: {'size': 'Dopio - 60 ml', 'price': 30}
-#         }
-#     },
-#     "Cacao": {
-#         "text": "Cacao",
-#         "sizes_prices": {
-#             6: {'size': 'Small - 200 ml', 'price': 45},
-#             7: {'size': 'Medium - 300 ml', 'price': 55},
-#             8: {'size': 'Big - 400 ml', 'price': 65}
-#         }
-#     },
-#     "Capuccino": {
-#         "text": "Capuccino",
-#         "sizes_prices": {
-#             9: {'size': 'Small - 150 ml', 'price': 40},
-#             10: {'size': 'Medium - 250 ml', 'price': 55},
-#             11: {'size': 'Big - 350 ml', 'price': 70}
-#         }
-#     },
-#     "Latte": {
-#         "text": "Latte",
-#         "sizes_prices": {
-#             12: {'size': 'Small - 200 ml', 'price': 55},
-#             13: {'size': 'Medium - 300 ml', 'price': 65},
-#             14: {'size': 'Big - 400 ml', 'price': 80}
-#         }
-#     }
-# }

@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
-from cafe_bot.other_funcs import json_update, json_reader
 from cafe_bot.other_funcs import list_to_str_json
 
 path = r'D:\coding\python\telegram\cafe_bot\general_info.json'
@@ -16,11 +15,6 @@ class SizePriceCBdata(CallbackData, prefix="size_price"):
 class AddToCartCB(CallbackData, prefix='add to cart'):
     coffee_name: str = None
     variant_id: int = None
-
-class BuyingFromCartCB(CallbackData, prefix='cart buying'):
-    user_id: str
-    general_price: int
-    variants_ids: str
 
 class PaymentMenuCB(CallbackData, prefix='payment menu'):
     variant_id: str
