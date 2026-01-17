@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 from cafe_bot.other_funcs import json_update, json_reader
+from cafe_bot.fsm.states import PaymentMenuCB
 
 path = r'D:\coding\python\telegram\cafe_bot\general_info.json'
 
@@ -14,6 +15,10 @@ class SizePriceCBdata(CallbackData, prefix="size_price"):
 
 class BuyingOperationCB(CallbackData, prefix='buying menu'):
     operation_type: str
+    coffee_name: str = None
+    variant_id: int = None
+
+class AddToCartCB(CallbackData, prefix='add to cart'):
     coffee_name: str = None
     variant_id: int = None
 
@@ -30,6 +35,7 @@ class ClearCartCB(CallbackData, prefix='clear cart'):
 
 class ShowCartCB(CallbackData, prefix="show cart"):
     user_id: str
+
 
 def generate_menu_catalog_kb(names, slugs):
     builder = InlineKeyboardBuilder()
@@ -52,32 +58,17 @@ def generate_sizes_prices_kb(variants_list, coffee_slug):
     return builder.as_markup()
 
 
-def generate_buying_menu(variant_id, coffee_name, coffee_slug):
+def generate_buying_menu(variant_id, coffee_name, coffee_slug, item_price):
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text='Buy now 💸', callback_data=BuyingOperationCB(operation_type='buying menu', coffee_name=coffee_name, variant_id=variant_id).pack()),
-        InlineKeyboardButton(text='Add to cart 🛒', callback_data=BuyingOperationCB(operation_type='add to cart', coffee_name=coffee_name, variant_id=variant_id).pack()),
+        InlineKeyboardButton(text='Buy now 💸', callback_data=PaymentMenuCB(paying_currency_amount=item_price, variant_id=variant_id).pack()),
+        InlineKeyboardButton(text='Add to cart 🛒', callback_data=AddToCartCB(coffee_name=coffee_name, variant_id=variant_id).pack()),
         InlineKeyboardButton(text='Back to sizes', callback_data=CoffeeNameCBdata(category=coffee_slug).pack()),
         InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')
     )
     builder.adjust(1, 1, 2)
     return builder.as_markup()
 
-
-def add_to_cart(cart_line: str, user_id: str):
-    info = json_reader(path)
-    if len(info) > 0:
-        if 'cart' in info.keys() and 'operations_qty' in info.keys():
-            if user_id in info["cart"].keys():
-                info["operations_qty"] += 1
-                info["cart"][user_id][info["operations_qty"]] = cart_line
-                json_update(path, info)
-            else:
-                raise KeyError("ERROR: User not found.")
-        else:
-            raise KeyError("ERROR: Key not found ('cart' or 'operation_qty').")
-    else:
-        raise Exception("ERROR: File is empty.")
 
 
 def generate_cart_bts(user_id: str, general_price: int, variants_ids: str):

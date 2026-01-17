@@ -1,9 +1,11 @@
-from aiogram.fsm import StatesGroup, State
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters.callback_data import CallbackData
 
-class PayingProcess(StatesGroup, CallbackData):
+class ValidatePayment(StatesGroup):
     paying_currency = State()
-    paying_currency_type: str = "💋"
+
+class PaymentMenuCB(CallbackData, prefix='payment menu'):
+    variant_id: int
     paying_currency_amount: int
 
 

@@ -1,13 +1,14 @@
-from ..database.filling_getting_user_info import add_to_cart_db, add_order_to_db, clear_user_cart, del_last_line_cart, get_coffee_name_by_type_id, get_cart_info, \
+from cafe_bot.database.filling_getting_user_info import add_to_cart_db, add_order_to_db, clear_user_cart, del_last_line_cart, get_coffee_name_by_type_id, get_cart_info, \
     get_variant_info, get_coffee_names, get_coffee_slugs, get_id_of_coffee_type, get_variants_by_id, check_cart_db_limit
 from aiogram import types, Router, F
 from cafe_bot.keyboards.menu import generate_menu_kb
-from aiogram.filters import Command
 from cafe_bot.keyboards.catalog_menu import BuyingFromCartCB, ClearCartCB, DeleteElCB ,generate_cart_bts, generate_menu_catalog_kb, generate_sizes_prices_kb, CoffeeNameCBdata, SizePriceCBdata, generate_buying_menu, BuyingOperationCB
 from cafe_bot.other_funcs import list_to_str_json
 from cafe_bot.logs.logging import logger
-from cafe_bot.fsm.states import PayingProcess
+from cafe_bot.fsm.states import ValidatePayment, PaymentMenuCB
 from aiogram.fsm.context import FSMContext
+from cafe_bot.fsm.paying_menu import payment_validator
+from cafe_bot.model.predictor import predict_time
 
 router = Router()
 path = r"D:\coding\python\telegram\cafe_bot\database\cafe_bot_info.db"
@@ -50,13 +51,53 @@ async def choose_size_buy(callback: types.CallbackQuery, callback_data: SizePric
     coffee_slug = callback_data.coffee_slug
     coffee_name = get_coffee_names(slug=coffee_slug)[0]
     var_info = get_variant_info(callback_data.variant_id)
+    items_amount = 1
     chosen_line = f"{coffee_name} | {var_info[2]} - {var_info[3]} ml | Price: {var_info[4]} Uah"
-    await callback.message.edit_text(text=f"{chosen_line}", reply_markup=generate_buying_menu(callback_data.variant_id, coffee_name, coffee_slug))
+    await callback.message.edit_text(text=f"{chosen_line}", reply_markup=generate_buying_menu(callback_data.variant_id, coffee_name, coffee_slug, var_info[4], ))
 
-@router.callback_query(PayingProcess.filter())
-async def paying_process(callback: types.callback_query, callback_data: PayingProcess, state: FSMContext):
-    await state.set_state(PayingProcess.paying_currency)
-    await callback.message.edit_text(text="")
+
+@router.callback_query(PaymentMenuCB.filter())
+async def paying_process(callback: types.callback_query, callback_data: ValidatePayment, state: FSMContext):
+    amount = callback_data.paying_currency_amount
+    var_info = get_variant_info(callback_data.variant_id)
+    coffee_name = get_coffee_name_by_type_id(var_info[1])
+
+    await state.update_data(variant_id = callback_data.variant_id, total_price = callback_data.paying_currency_amount, coffee_name=coffee_name)
+    await state.set_state(ValidatePayment.paying_currency)
+    await callback.message.edit_text(text=f"This is payment menu 💸\nYou ordered: {coffee_name} | {var_info[2]} - {var_info[3]} ml | Price: {var_info[4]} Uah"
+                                          f"\nTotal price: {amount} Uah\n\nPlease, pay using 💋 ")
+
+@router.message(ValidatePayment.paying_currency)
+async def receiving_payment(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = str(message.from_user.id)
+    if payment_validator(message.text):
+        variant_id = data.get("variant_id")
+        total_price = data.get("total_price")
+        coffee_name = data.get("coffee_name")
+        time_to_wait_message = predict_time(coffee_name, variant_id)
+        order_id = add_order_to_db(user_id, total_price, variant_id)
+        logger.bind(type='sale').info(
+            f"User {message.from_user.username} ({user_id}) ordered (order id: {order_id}) | Variant id: {variant_id}")
+        logger.bind(type='payment').info(
+            f"User {message.from_user.username} ({user_id}) made a payment: SUCCESSFUL. | Order id: {order_id}")
+        await state.clear()
+        await message.answer(text=f"Payment received successfully! 💸\nOrder ID: {order_id}\n\n{time_to_wait_message}"
+                                     "\n\nThank you for using our bot!", reply_markup=types.InlineKeyboardMarkup(
+                        inline_keyboard=[
+                            [types.InlineKeyboardButton(text='Open menu', callback_data='Back to menu')]
+                        ]
+                    ))
+    else:
+        await state.clear()
+        logger.bind(type='payment').info(
+            f"User {message.from_user.username} ({user_id}) had an attempt to make a payment: FATAL. Reason: Invalid payment.")
+        await message.answer(text="Invalid payment received, please try more!", reply_markup=types.InlineKeyboardMarkup(
+                        inline_keyboard=[
+                            [types.InlineKeyboardButton(text='Back to menu', callback_data='Back to menu')]
+                        ]
+                    ))
+
 
 
 @router.callback_query(BuyingOperationCB.filter())
