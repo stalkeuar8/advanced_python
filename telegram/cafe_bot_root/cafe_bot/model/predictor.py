@@ -14,6 +14,7 @@ def day_time_identifier():
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / 'coffee_predictor.pkl'
+package = joblib.load(MODEL_PATH)
 
 def predict_time(coffee_name: str, variant_id: int):
     day_time_work_qty = day_time_identifier()
@@ -25,7 +26,6 @@ def predict_time(coffee_name: str, variant_id: int):
         'day time' : [day_time_work_qty[0]],
         'month' : [datetime.datetime.now().strftime('%B')]
     }
-    package = joblib.load(MODEL_PATH)
     model = package['model']
     expected_columns = package['features']
     df_new = pd.DataFrame(new_data)

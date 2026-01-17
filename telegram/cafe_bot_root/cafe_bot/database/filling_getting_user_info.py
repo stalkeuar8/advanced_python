@@ -162,6 +162,7 @@ def add_order_to_db(user_tg_id: str, general_price: int, variants_ids: str) -> i
     with sqlite3.connect(DB_PATH) as db_file:
         c = db_file.cursor()
         c.execute("INSERT INTO orders (order_id, user_tg_id, general_price, variants_ids) VALUES (?, ?, ?, ?)", (order_id, user_tg_id, general_price, variants_ids))
+        db_file.commit()
     return order_id
 
 @is_db_exists

@@ -3,7 +3,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 from cafe_bot.other_funcs import list_to_str_json
 
-path = r'D:\coding\python\telegram\cafe_bot\general_info.json'
 
 class CoffeeNameCBdata(CallbackData, prefix="coffee_name"):
     category: str
