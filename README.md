@@ -1,13 +1,17 @@
 <div align="left">
 
-# [☕ Smart Cafe AI Bot](telegram/cafe_bot_root/cafe_bot)
+### [Advanced python learning](1_advanced_python) 
 
-**A modern ordering system for Telegram featuring a smart cart, async database operations, and mock payment processing.**
+Repo with learning intermediate and advanced Python features. Everyday updating 
 
 ---
 
-### 🚀 Key Feature
-Uses an **ML model** to calculate realistic **order preparation time** based on time of day and queue size.
+
+### [Telegram](telegram) 
+
+Repo with learning "aiogram3" and practice. Async Bots Cafe_bot and Library_bot with sqlite integration 
+
+---
 
 ### 🛠 Tech Stack
 
