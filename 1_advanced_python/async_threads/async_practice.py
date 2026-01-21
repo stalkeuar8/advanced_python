@@ -5,7 +5,6 @@ import time
 from functools import wraps
 
 
-
 # TASK-4
 
 def async_retry(max_attempts=3, base_delay=1):
