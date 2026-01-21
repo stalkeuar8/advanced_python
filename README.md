@@ -9,7 +9,7 @@ Repo with learning intermediate and advanced Python features. Everyday updating
 
 ### [Telegram](telegram) 
 
-Repo with learning "aiogram3" and practice. Async Bots Cafe_bot and Library_bot with sqlite integration 
+Repo with learning "aiogram3" and practice. Async Bots Cafe_bot and Library_bot with sqlite and scikit-learn integration 
 
 ---
 
