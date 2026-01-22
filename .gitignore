@@ -1,5 +1,4 @@
-/1_advanced_python/pytest_pr/pytest.ini
-
+*.ini
 __pycache__/
 *.py[cod]
 *$py.class
