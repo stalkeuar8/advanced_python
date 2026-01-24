@@ -6,22 +6,22 @@ class Typing:
         self.type = type
         self.min_value = min_value
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, obj_type, name):
         self.name = name
         self.private_name = '_' + name
 
-    def __get__(self, instance, owner=None):
-        if instance is None:
+    def __get__(self, obj, obj_type=None):
+        if obj is None:
             return self
 
-        return getattr(instance, self.private_name, None)
+        return getattr(obj, self.private_name, None)
     
-    def __set__(self, instance, value):
+    def __set__(self, obj, value):
         if not isinstance(value, self.type):
             raise TypeError(f"Wrong type: {self.name}. Needed '{self.type}', got '{type(value)}' instead.")
         if self.min_value is not None and value < self.min_value:
             raise ValueError(f"Value '{self.name}' must be bigger than '{self.min_value}', got '{value}' instead.")
-        setattr(instance, self.private_name, value)
+        setattr(obj, self.private_name, value)
 
 class Product:
 
