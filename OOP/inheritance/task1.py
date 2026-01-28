@@ -52,16 +52,16 @@ class CsvSource(BaseDataSource):
 
 
 
-try:
-    path1 = "somedata1.txt"
-    path2 = 'somedata2.txt'
-    json_obj = JsonSource(path=path1)
-    res1 = json_obj.load_data(path=path1)
-    print(res1)
-    csv_obj = CsvSource(path=path2)
-    res2 = csv_obj.load_data(path=path2)
-    print(res2)
-except Exception as e:
-    print(e)
+# try:
+#     path1 = "somedata1.txt"
+#     path2 = 'somedata2.txt'
+#     json_obj = JsonSource(path=path1)
+#     res1 = json_obj.load_data(path=path1)
+#     print(res1)
+#     csv_obj = CsvSource(path=path2)
+#     res2 = csv_obj.load_data(path=path2)
+#     print(res2)
+# except Exception as e:
+#     print(e)
 
 

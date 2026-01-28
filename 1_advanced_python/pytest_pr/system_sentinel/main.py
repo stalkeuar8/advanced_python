@@ -57,7 +57,7 @@ async def main():
         print(log)
     del anomaly
 
-asyncio.run(main())
+# asyncio.run(main())
 
 
 

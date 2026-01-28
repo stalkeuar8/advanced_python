@@ -1,11 +1,11 @@
 students = [
-    {'name': 'Марія', 'grade': 92},
-    {'name': 'Іван', 'grade': 85},
-    {'name': 'Петро', 'grade': 78}
+    {'name': 'Mary', 'grade': 92},
+    {'name': 'Bob', 'grade': 85},
+    {'name': 'John', 'grade': 78}
 ]
 
 print(sorted(students, key=lambda student: student['grade'], reverse=True))
-words = ['кіт', 'собак', 'слон', 'папуга']
+words = ['cat', 'dog', 'elephant', 'mash']
 print(max(words, key=lambda word: len(word)))
 
 # print(list(map(lambda value: (value*9/5)+32, [25, 30, 0, 11, 44, 12])))
