@@ -1,10 +1,19 @@
-class FileLogger:
+from abc import ABC, abstractmethod
+
+class Logger(ABC):
+
+    @abstractmethod
+    def log(self, message):
+        pass
+
+
+class FileLogger(Logger):
     def log(self, message):
         with open("log.txt", "a") as f:
             f.write(f"LOG: {message}\n")
 
 class App:
-    def __init__(self, logger: FileLogger):
+    def __init__(self, logger: Logger):
         self.logger = logger
 
     def do_work(self):
