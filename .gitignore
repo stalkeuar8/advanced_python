@@ -55,3 +55,4 @@ config.json (якщо там паролі)
 .DS_Store
 Thumbs.db
 /OOP/basics/basic_oop.py
+OOP/final oop proj/database.json
