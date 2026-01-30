@@ -1,5 +1,5 @@
 
-
+*.ipynb
 *.ini
 __pycache__/
 *.py[cod]
@@ -33,7 +33,7 @@ venv.bak/
 .flaskenv
 secrets.py
 *.log
-config.json (якщо там паролі)
+config.json 
 
 *.db
 *.sqlite3
@@ -41,7 +41,7 @@ config.json (якщо там паролі)
 
 .ipynb_checkpoints
 .anaconda/
-/data/ (якщо там величезні датасети)
+/data/
 *.pkl
 *.joblib
 *.model
@@ -56,3 +56,4 @@ config.json (якщо там паролі)
 Thumbs.db
 /OOP/basics/basic_oop.py
 OOP/final oop proj/database.json
+telegram/cafe_bot_root/cafe_bot/model/dataset_generator.py

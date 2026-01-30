@@ -87,5 +87,3 @@ for _ in range(NUM_SAMPLES):
 
 df = pd.DataFrame(data)
 df.to_csv("coffee_shop_data.csv", index=False)
-
-print(df.head(10))
