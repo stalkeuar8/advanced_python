@@ -1,6 +1,5 @@
 import json 
 from pathlib import Path
-from config import JSON_FILE_NAME
 
 
 def is_file_exists(filepath):
@@ -29,7 +28,40 @@ def update_json(filename, updated_dict):
     path = get_abs_path(filename)
     if is_file_exists(path):
         with open(path, 'w', encoding='utf-8') as file:
-            json.dump(updated_dict, file)
+            json.dump(updated_dict, file, indent=4)
             return True
     
     return False
+
+
+
+
+# order_sample = {
+#     'id_1' : {
+#         'items' : {
+#             'apple' : 15,
+#             'banana' : 25,
+#             'tomato' : 50,
+#         },
+#         'total_weigth' : 90, 
+#         'performed_by' : 'lwr1'
+#     },
+#     'id_2' : {
+#         'items' : {
+#             'apple' : 15,
+#             'banana' : 25,
+#             'tomato' : 50,
+#         },
+#         'total_weigth' : 90, 
+#         'performed_by' : 'lwr1'
+#     },
+#     'id_3' : {
+#         'items' : {
+#             'apple' : 15,
+#             'banana' : 25,
+#             'tomato' : 50,
+#         },
+#         'total_weigth' : 90, 
+#         'performed_by' : 'lwr1'
+#     },
+# }
